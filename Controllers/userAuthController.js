@@ -17,7 +17,6 @@ export const Signup = async(req,res,next) => {
         }else{
     
             const hashpass = await bcrypt.hash(password,10)
-            console.log(hashpass,"else case");
             const newUser = new User({
                 name:name,
                 email:email,
@@ -33,11 +32,11 @@ export const Signup = async(req,res,next) => {
             }).save()
             const url = `${process.env.SERVERURL}/${user._id}/verify/${emailtoken.token}`
             await sendMail(user.email,"Verify Email",url);
-            console.log("email Succes");
-            return res.status(200).json({created:true,token:token,message:"verification gmail has been sent to your gmail"})
+            console.log("email Succes")
+            return res.status(200).json({created:true,emailtoken,message:"verification mail has been sent to your Gmail"})
         }
     } catch (error) {
-        
+        console.log(error.message);
     }
 }
 
@@ -60,7 +59,9 @@ export const Signup = async(req,res,next) => {
 
         const jwtToken = jwt.sign({_id:user._id},
             process.env.JWTKEY,{ expiresIn: "24hr" })
-            res.status(200).json({user:user,jwtToken,message:"email verification success"})
+        const redirectUrl = process.env.REDIRECTURL
+        res.redirect(redirectUrl)
+            // res.status(200).json({user:user,jwtToken,message:"email verification success"})
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "internal server error" });

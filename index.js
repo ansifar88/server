@@ -12,6 +12,7 @@ dotenv.config();
 // Import your route modules
 import userAuth from './Routes/User/userAuthRoutes.js';
 import doctorAuth from './Routes/Doctor/doctorAuthRoutes.js'
+import adminAuth from './Routes/Admin/adminAuthRoutes.js'
 
 import UserRoutes from './Routes/User/userRoutes.js';
 import DoctorRoutes from './Routes/Doctor/doctorRoutes.js';
@@ -40,8 +41,10 @@ app.use(cors({
     credentials:true
 }))
 
-app.use('/auth',userAuth)
-app.use('/docAuth',doctorAuth)
+app.use('/user/auth',userAuth)
+app.use('/doctor/docAuth',doctorAuth)
+app.use('/admin/adminAuth',adminAuth)
+
 
 app.use('/user',UserRoutes)
 app.use('/doctor',DoctorRoutes)

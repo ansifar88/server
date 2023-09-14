@@ -31,6 +31,7 @@ export const Signup = async(req,res,next) => {
 
 export const Login = async (req,res,next)=>{
     try {
+        console.log("doclogin");
         const {email,password} = req.body
         const doctor = await Doctor.findOne({email:email})
         if (!doctor) {
