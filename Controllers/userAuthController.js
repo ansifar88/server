@@ -74,7 +74,7 @@ export const Signup = async(req,res,next) => {
         console.log(email,password,"ep")
         const user = await User.findOne({email:email})
         console.log(user,"useer");
-        if (!user) {
+        if (!user || user.is_admin === true) {
             return res.status(201).json({access:false,message:"user not found"})
         }
         const isCorrect = await bcrypt.compare(password,user.password)
