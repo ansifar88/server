@@ -15,13 +15,14 @@ export const Signup = async(req,res,next) => {
             
             return res.status(200).json({created:false,message:"email already exist"})
         }else{
-    
+            const date = new Date()
             const hashpass = await bcrypt.hash(password,10)
             const newUser = new User({
                 name:name,
                 email:email,
                 mobile:mobile,
-                password:hashpass
+                password:hashpass,
+                joinDate:date
             })
             let user = await newUser.save().then(console.log("Registered"))
           
@@ -98,12 +99,13 @@ export const Signup = async(req,res,next) => {
         if (exist) {
             return res.status(200).json({created:false,message:"email Already exists"})
         }else{
-           
+            const date = new Date()
             const hashPass = await bcrypt.hash(id,10)
             const newUser = new User({
                 name:name,
                 email:email,
-                password:hashPass
+                password:hashPass,
+                joinDate:date
             })
             let user = await newUser.save().then(
                 console.log("saved")

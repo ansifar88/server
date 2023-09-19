@@ -34,11 +34,15 @@ const UserSchema = new Schema({
   height: { 
     type: Number 
   },
+  joinDate: { 
+    type: Date 
+  },
   photo: { 
     type: String 
   }, 
   is_blocked: { 
-    type: Boolean 
+    type: Boolean ,
+    default:false
   },
   verified: { 
     type: Boolean,

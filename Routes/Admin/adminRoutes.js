@@ -1,4 +1,9 @@
 import express from 'express'
-const AdminRoute = express.Router()
+const router = express.Router()
 
-export default AdminRoute
+import { allUsers,userManage } from '../../Controllers/adminController.js'
+
+router.get('/users',allUsers)
+router.put('/manageuser/:id',userManage)
+
+export default router
