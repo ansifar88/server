@@ -18,37 +18,38 @@ const DoctorSchema = new Schema({
      type: String,
      required: true 
 },
-  Is_verified: {
+  is_verified: {
      type: Boolean
  },
-  Is_blocked: {
+  is_blocked: {
      type: Boolean
  },
-  CurrentHospital: {
+  currentHospital: {
      type: String
  },
-  YearOfGraduation: {
-     type: Date 
+//   YearOfGraduation: {
+//      type: Date 
+// },
+  department: {
+     type: Schema.Types.ObjectId ,
+     ref:"Department"
 },
-  Department: {
-     type: Schema.Types.ObjectId 
-},
-  Experience: {
+  experience: {
      type: Number 
 },
-  Hospitals: {
+  hospitals: {
      type: Array,  
 },
-  Description: {
+  description: {
      type: String
  },
-  Certificates: {
+  dertificates: {
      type: Array,  
 },
-  Slot: {
+  slot: {
      type: Number 
 },
-  Photo: {
+  displaypcture: {
      type: String 
 },
 });

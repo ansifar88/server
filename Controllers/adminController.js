@@ -1,4 +1,6 @@
+import Department from "../Models/departmentModel.js";
 import User from "../Models/userModel.js";
+import { upperCase } from "upper-case";
 
 export const allUsers = async(req,res,next) => {
     try {
@@ -22,6 +24,43 @@ export const userManage = async(req,res,next) => {
         }
         
     } catch (error) {
+        console.log(error.message);
+    }
+}
+
+export const addDepartment = async(req,res,next)=>{
+    try {
+        const{departmentName,description} = req.body
+        console.log(departmentName,description);
+        const department =upperCase(departmentName) 
+        const exist = await Department.findOne({departmentName:department})
+        if(exist){
+            return res.status(200).json({created:false,message:"Department Already exist"})
+        }else{
+            const newDep = new Department({
+                departmentName:department,
+                description:description
+            })
+            let newdepartment = await newDep.save()
+            if (newdepartment) {
+                return res.status(200).json({created:true,message:"Department Added"})
+            }
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+export const allDepartments = async(req,res,next) => {
+    try {console.log("hhhh");
+        const departments = await Department.find()
+        if (departments) {
+            
+            return res.status(200).json({data:departments})
+        }else{
+            return res.status(200).json({message:"Departments not found"})
+
+        }
+   } catch (error) {
         console.log(error.message);
     }
 }
