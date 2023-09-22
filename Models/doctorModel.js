@@ -37,19 +37,19 @@ const DoctorSchema = new Schema({
   experience: {
      type: Number 
 },
-  hospitals: {
-     type: Array,  
+qualification: {
+     type: String,  
 },
   description: {
      type: String
  },
-  dertificates: {
+  certificates: {
      type: Array,  
 },
   slot: {
      type: Number 
 },
-  displaypcture: {
+  displaypicture: {
      type: String 
 },
 });

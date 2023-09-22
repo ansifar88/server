@@ -51,7 +51,7 @@ export const addDepartment = async(req,res,next)=>{
     }
 }
 export const allDepartments = async(req,res,next) => {
-    try {console.log("hhhh");
+    try {
         const departments = await Department.find()
         if (departments) {
             
