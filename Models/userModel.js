@@ -37,14 +37,19 @@ const UserSchema = new Schema({
   joinDate: { 
     type: Date 
   },
-  photo: { 
-    type: String 
+  displaypicture: { 
+    type: String ,
+    default:""
   }, 
   is_blocked: { 
     type: Boolean ,
     default:false
   },
   verified: { 
+    type: Boolean,
+    default:false
+  },
+  completed: { 
     type: Boolean,
     default:false
   },

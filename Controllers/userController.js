@@ -1,4 +1,6 @@
 import Doctor from '../Models/doctorModel.js'
+import User from '../Models/userModel.js'
+
 export const allDoctors = async(req,res,next)=>{
     try {
         const doctors = await Doctor.find({verified:true,is_blocked:false}).populate("department")
@@ -26,5 +28,21 @@ export const doctorSingle =async(req,res,next)=>{
         }
     } catch (error) {
         console.log(error.message);
+    }
+}
+
+
+export const getUser= async (req,res,next)=>{
+    try {
+        const id = req.params.id
+        const data = await User.findById(id)
+        if (data) {
+            return res.status(200).json({data:data})
+        }else{
+
+            return res.status(200).json({message:"Data not found"}) 
+        }
+    } catch (error) {
+        console.log(error.message); 
     }
 }
