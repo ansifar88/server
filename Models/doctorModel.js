@@ -18,18 +18,21 @@ const DoctorSchema = new Schema({
      type: String,
      required: true 
 },
-  is_verified: {
-     type: Boolean
+  verified: {
+     type: Boolean,
+     default:false
  },
   is_blocked: {
-     type: Boolean
+     type: Boolean,
+     default:false
  },
   currentHospital: {
      type: String
  },
-//   YearOfGraduation: {
-//      type: Date 
-// },
+ requested:{
+   type:Boolean,
+   default:false
+ },
   department: {
      type: Schema.Types.ObjectId ,
      ref:"Department"
@@ -50,7 +53,8 @@ qualification: {
      type: Number 
 },
   displaypicture: {
-     type: String 
+     type: String ,
+     default:""
 },
 });
 

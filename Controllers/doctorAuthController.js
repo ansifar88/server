@@ -20,7 +20,7 @@ export const Signup = async(req,res,next) => {
             })
             let doctor = await newDoctor.save().then(console.log("Registered"))
             const token = jwt.sign({ doctorId:newDoctor._id },process.env.JWTKEY,{expiresIn:"24hr"})
-            return res.status(200).json({created:true,token:token,message:"registration"})
+            return res.status(200).json({created:true,token:token,doctor,message:"registration"})
         }
 
     } catch (error) {
@@ -34,6 +34,7 @@ export const Login = async (req,res,next)=>{
         console.log("doclogin");
         const {email,password} = req.body
         const doctor = await Doctor.findOne({email:email})
+        console.log(doctor);
         if (!doctor) {
             return res.status(201).json({access:false,message:"user not found"})
         }
