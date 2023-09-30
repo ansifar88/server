@@ -1,5 +1,6 @@
 import Doctor from '../Models/doctorModel.js'
 import User from '../Models/userModel.js'
+import { uploadToCloudinary } from '../utils/cloudinary.js'
 
 export const allDoctors = async(req,res,next)=>{
     try {
@@ -44,5 +45,54 @@ export const getUser= async (req,res,next)=>{
         }
     } catch (error) {
         console.log(error.message); 
+    }
+}
+
+export const updateProfile = async(req,res,next)=>{
+    try {
+        const userId = req.params.id
+        console.log(userId,"user updateProfile");
+        const{gender,city,dob,height,weight,blood} = req.body
+        const updatedUser = await User.updateOne({_id:userId},{$set:{
+            gender:gender,
+            city:city,
+            dob:dob,
+            weight:weight,
+            height:height,
+            blood:blood,
+            completed:true
+        }})
+        if (updatedUser) {
+            console.log("updated",updatedUser);
+            return res.status(200).json({data:updatedUser,message:"profile updated"})
+        }else{
+            return res.status(200).json({message:"profile updation failed"})
+
+        }
+
+        console.log(req.body);
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+export const updateDp = async(req,res,next)=>{
+    try {
+        const userId = req.params.id
+        console.log(userId,"dpdpdpdpdpdpd");
+        const img = req.file.path
+        const uploadDp = await uploadToCloudinary(img,"dp")
+        const updatedDp = await User.updateOne({_id:userId},{$set:{
+            displaypicture : uploadDp.url
+        }})
+        if (updatedDp) {
+            console.log("dp updated",updatedDp);
+            return res.status(200).json({data:updatedDp,message:"updated"})
+        }else{
+            return res.status(200).json({message:"updation failed"})
+        }
+
+    } catch (error) {
+        console.log(error.message);
     }
 }

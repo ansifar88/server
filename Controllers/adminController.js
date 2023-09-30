@@ -119,3 +119,34 @@ export const allDoctors =async(req,res,next) =>{
         console.log(error.message);
     }
 }
+
+export const doctorManage = async(req,res,next) => {
+    try {
+        const id = req.params.id
+        const doctor = await Doctor.findById(id)
+        if (doctor) {
+            await Doctor.updateOne({_id:id},{$set:{is_blocked:!doctor.is_blocked}})
+            res.status(200).json({ message: doctor.is_blocked ? "doctor Blocked" : "doctor UnBlocked" });
+        }else{
+            res.status(404).json({message:"usernot found"})
+        }
+        
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+export const departmentManage = async(req,res,next) => {
+    try {
+        const id = req.params.id
+        const department = await Department.findById(id)
+        if (department) {
+            await Department.updateOne({_id:id},{$set:{status:!department.status}})
+            res.status(200).json({ message: department.status ? "department Deleted" : "department Listed" });
+        }else{
+            res.status(404).json({message:"Department not found"})
+        }
+        
+    } catch (error) {
+        console.log(error.message);
+    }
+}

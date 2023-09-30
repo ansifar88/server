@@ -34,6 +34,9 @@ const UserSchema = new Schema({
   height: { 
     type: Number 
   },
+  city: { 
+    type: String 
+  },
   joinDate: { 
     type: Date 
   },
