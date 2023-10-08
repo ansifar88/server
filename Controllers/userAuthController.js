@@ -81,12 +81,12 @@ export const login = async (req, res, next) => {
     if (!user || user.is_admin === true) {
       return res.status(201).json({ access: false, message: "user not found" });
     }
-     if(user.is_blocked === true){
-      return res.status(201).json({ access: false, message: "You are blocked by admin" });
-
+    if (user.is_blocked === true) {
+      return res
+        .status(201)
+        .json({ access: false, message: "You are blocked by admin" });
     }
     const isCorrect = await bcrypt.compare(password, user.password);
-    console.log(isCorrect, "iscorrect");
     if (!isCorrect)
       return res
         .status(201)
@@ -95,7 +95,6 @@ export const login = async (req, res, next) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWTUSERSECRET, {
       expiresIn: "24hr",
     });
-    console.log(token, "token");
 
     return res
       .status(200)
