@@ -45,6 +45,7 @@ export const doctorAuth = async (req, res, next) => {
       });
       if (doctor) {
         if (doctor.is_blocked === false) {
+          req.headers.doctorId = decoded.doctorId
           next();
         } else {
           return res

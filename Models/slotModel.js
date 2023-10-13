@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
+const { Schema, ObjectId } = mongoose;
 
-
-const slotSchema = new mongoose.Schema({
+const slotSchema = new Schema({
     doctor: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Doctor',
         required: true,
     },
@@ -17,7 +17,7 @@ const slotSchema = new mongoose.Schema({
                 type: Date
             },
             slotDate: {
-                type: String,
+                type: Date,
                 required: true,
             },
             isBooked: {
@@ -36,4 +36,4 @@ const slotSchema = new mongoose.Schema({
 
 const Slot = mongoose.model('Slot', slotSchema);
 
-module.exports = Slot;
+export default Slot;

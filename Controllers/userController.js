@@ -20,11 +20,10 @@ export const allDoctors = async (req, res, next) => {
 };
 export const doctorSingle = async (req, res, next) => {
   try {
-    console.log("insider the functin");
+    console.log("inside the docsingle");
     const id = req.params.id;
     console.log(id);
     const doctor = await Doctor.findOne({ _id: id }).populate("department");
-    console.log(doctor);
     if (doctor) {
       res.status(200).json({ data: doctor, message: "success" });
     } else {

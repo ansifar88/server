@@ -118,3 +118,16 @@ export const editProfile = async (req, res, next) => {
     console.log(error.message);
   }
 };
+export const allDepartments = async(req,res,next)=>{
+  try {
+    const department = await Department.find()
+    if (department) {
+      return res.status(200).json({data : department,message:"data found"})
+    }else{
+      return res.status(200).json({message:"data not found"})
+
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+}
