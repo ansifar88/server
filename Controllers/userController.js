@@ -1,3 +1,4 @@
+import Chat from "../Models/chatModel.js";
 import Doctor from "../Models/doctorModel.js";
 import User from "../Models/userModel.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
@@ -138,4 +139,48 @@ export const updateDp = async (req, res, next) => {
   } catch (error) {
     console.log(error.message);
   }
+};
+
+
+
+export const fetchChats=async(req,res)=>{
+  try {
+      console.log('reached');
+      const {userId}=req.params
+      const result = await Chat.find({ "users.user": userId }).populate('users.user', '-password')
+      .populate('users.doctor', '-password')
+      .populate('latestMessage').populate({
+          path: 'latestMessage',
+          populate: {
+            path: 'sender.doctor' ? 'sender.doctor' : 'sender.user',
+            select: '-password',
+          },
+        }).populate({
+          path: 'latestMessage',
+          populate: {
+            path: 'sender.user',
+            select: '-password',
+          },
+        }).then((result)=>{console.log(result),res.send(result)});
+      
+  } catch (error) {
+      console.log(error.message);
+  }
+} 
+
+export const searchUsers = async (req, res) => {
+  console.log('reached');
+  const keyword = req.query.search
+    ? {
+        $or: [
+          { name: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+        ],
+      }
+    : {};
+   
+
+  const users = await Doctor.find(keyword) //.find({ _id: { $ne: req.user._id } });
+  console.log(users);
+  res.status(200).json(users);
 };

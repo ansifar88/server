@@ -1,64 +1,69 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const { Schema, ObjectId } = mongoose;
 
 const DoctorSchema = new Schema({
   name: {
-     type: String,
-     required: true 
-},
+    type: String,
+    required: true,
+  },
   email: {
-     type: String,
-     required: true 
-},
+    type: String,
+    required: true,
+  },
   mobile: {
-     type: Number,
-},
+    type: Number,
+  },
   password: {
-     type: String,
-     required: true 
-},
+    type: String,
+    required: true,
+  },
   verified: {
-     type: Boolean,
-     default:false
- },
+    type: Boolean,
+    default: false,
+  },
   is_blocked: {
-     type: Boolean,
-     default:false
- },
+    type: Boolean,
+    default: false,
+  },
   currentHospital: {
-     type: String
- },
- requested:{
-   type:Boolean,
-   default:false
- },
+    type: String,
+  },
+  cunsultationFee: {
+    type: Number,
+  },
+  requested: {
+    type: Boolean,
+    default: false,
+  },
   department: {
-     type: Schema.Types.ObjectId ,
-     ref:"Department"
-},
+    type: Schema.Types.ObjectId,
+    ref: "Department",
+  },
   experience: {
-     type: Number 
-},
-qualification: {
-     type: String,  
-},
+    type: Number,
+  },
+  qualification: {
+    type: String,
+  },
+  wallet: {
+    type: Number,
+  },
   description: {
-     type: String
- },
+    type: String,
+  },
   certificates: {
-     type: Array,  
-},
+    type: Array,
+  },
   slot: {
-     type: Number 
-},
+    type: Number,
+  },
   displaypicture: {
-     type: String ,
-     default:""
-},
+    type: String,
+    default: "",
+  },
 });
 
-const Doctor = mongoose.model('Doctor', DoctorSchema);
+const Doctor = mongoose.model("Doctor", DoctorSchema);
 
 export default Doctor;
-

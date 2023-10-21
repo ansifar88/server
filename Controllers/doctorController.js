@@ -1,5 +1,7 @@
+import Chat from "../Models/chatModel.js";
 import Department from "../Models/departmentModel.js";
 import Doctor from "../Models/doctorModel.js";
+import User from "../Models/userModel.js";
 import {
   uploadToCloudinary,
   MultiUploadCloudinary,
@@ -11,10 +13,12 @@ export const updateProfile = async (req, res, next) => {
     const doctorId = req.params.id;
     const {
       currentHospital,
+      // cunsultationFee,
       department,
       qualification,
       experience,
       description,
+
     } = req.body;
     const uploadedImages = await MultiUploadCloudinary(
       req.files,
@@ -26,6 +30,7 @@ export const updateProfile = async (req, res, next) => {
       {
         $set: {
           currentHospital: currentHospital,
+          // cunsultationFee : cunsultationFee,
           department: depName,
           qualification: qualification,
           experience: experience,
@@ -90,6 +95,7 @@ export const editProfile = async (req, res, next) => {
     const {
       name,
       currentHospital,
+      cunsultationFee,
       department,
       qualification,
       experience,
@@ -105,6 +111,7 @@ export const editProfile = async (req, res, next) => {
           department: depName,
           qualification: qualification,
           experience: experience,
+          cunsultationFee: cunsultationFee,
           description: description,
         },
       }
@@ -129,5 +136,49 @@ export const allDepartments = async(req,res,next)=>{
     }
   } catch (error) {
     console.log(error.message);
+  }
+}
+
+export const fetchChats=async(req,res)=>{
+  try {
+      console.log('reached');
+      const {userId}=req.params
+      const result = await Chat.find({ "users.doctor": userId }).populate('users.user', '-password') 
+      .populate('users.doctor', '-password')
+      .populate('latestMessage').populate({
+          path: 'latestMessage',
+          populate: {
+            path: 'sender.doctor',
+            select: '-password',
+          },
+        }).populate({
+          path: 'latestMessage', 
+          populate: {
+            path: 'sender.user',
+            select: '-password',
+          },
+        }).then((result)=>{console.log(result),res.send(result)});
+  } catch (error) {
+      console.log(error.message);
+  }
+}
+export const searchUsers=async(req,res)=>{
+  try {
+      console.log('reached');
+      const keyword = req.query.search
+        ? {
+            $or: [
+              { name: { $regex: req.query.search, $options: "i" } },
+              { email: { $regex: req.query.search, $options: "i" } },
+            ],
+          }
+        : {};
+        console.log(keyword);
+    
+      const users = await User.find(keyword) //.find({ _id: { $ne: req.user._id } });
+      console.log(users);
+      res.status(200).json(users);
+  } catch (error) {
+      console.log(error.message);
   }
 }

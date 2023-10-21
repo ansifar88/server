@@ -16,6 +16,8 @@ export const userAuth = async (req, res, next) => {
       });
       if (user) {
         if (user.is_blocked === false) {
+          req.headers.userId = decoded.userId
+
           next();
         } else {
           return res
