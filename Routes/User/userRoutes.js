@@ -5,7 +5,7 @@ import upload from '../../MiddleWares/multer.js';
 import { allDoctors,doctorSingle,getUser,updateProfile,updateDp,editProfile, fetchChats, searchUsers } from '../../Controllers/userController.js';
 import { userAuth } from '../../MiddleWares/Auth.js';
 import { getSlotDateUser,getSlotsUser, payment ,addAppointment, appointmentsUser} from '../../Controllers/slotController.js';
-import { accessChat } from '../../Controllers/chatController.js';
+import { accessChat, allMessages, sendMessage } from '../../Controllers/chatController.js';
 
 router.get('/SnDOC/:id',userAuth,doctorSingle)
 router.get('/doctors',userAuth,allDoctors)
@@ -23,5 +23,7 @@ router.get('/appointments',userAuth,appointmentsUser)
 router.post('/accesschat',accessChat)
 router.get('/fetchchat/:userId',fetchChats)
 router.get('/usersearch',searchUsers)
+router.post('/message',sendMessage)
+router.get('/message/:chatId',allMessages)
 
 export default router 

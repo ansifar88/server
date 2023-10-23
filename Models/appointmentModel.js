@@ -8,6 +8,7 @@ const appointmentSchema = new Schema(
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     consultingFee: { type: Number, required: true },
     isConsulted: { type: Boolean, default: false },
+    callId: { type: String, default: '' },
     paymentStatus: {
       type: String,
       enum: ["pending", "success"],
@@ -19,7 +20,7 @@ const appointmentSchema = new Schema(
         "consulted",
         "cancelled",
         "notConsulted",
-        "cancellation-requested",
+        // "cancellation-requested",
       ],
       default: "notConsulted",
     },

@@ -1,4 +1,6 @@
 import Chat from "../Models/chatModel.js";
+import Message from "../Models/messageModel.js";
+import User from "../Models/userModel.js";
 
 export const accessChat = async (req, res) => {
   console.log("inside access chat");
@@ -57,3 +59,90 @@ export const accessChat = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+
+export const sendMessage = async (req, res) => {
+    try {
+      const { content, chatId, userId } = req.body;
+      if (!content || !chatId) {
+        console.log('Invalid parameters');
+        return res.status(400);
+      }
+      console.log(userId);
+      const newMessage = {
+        sender: { user: userId },
+        content: content,
+        chat: chatId,
+      };
+  
+      let message = await Message.create(newMessage);
+  
+      message = await message.populate('sender.user', 'name')
+      message = await message.populate('chat')
+  
+      message = await User.populate(message, [
+        {
+          path: 'chat.users.user',
+          select: 'name email',
+        }
+      ]);
+  
+      console.log(message, 'message');
+  
+      let data=await Chat.findByIdAndUpdate(chatId, {
+        latestMessage: message,
+      }, { new: true });
+      console.log(data);
+  
+      res.json(message);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  export const doctorMessage = async (req, res) => {
+    try {
+      const { content, chatId, userId } = req.body;
+      if (!content || !chatId) {
+        console.log('Invalid parameters');
+        return res.status(400);
+      }
+      console.log(userId);
+      const newMessage = {
+        sender: { doctor: userId },
+        content: content,
+        chat: chatId,
+      };
+  
+      let message = await Message.create(newMessage);
+  
+      message = await message.populate('sender.doctor', 'name')
+      message = await message.populate('chat')
+  
+      message = await User.populate(message, [
+        {
+          path: 'chat.users.doctor',
+          select: 'name email',
+        }
+      ])
+  
+      console.log(message, 'message');
+  
+      let data=await Chat.findByIdAndUpdate(chatId, {
+        latestMessage: message,
+      }, { new: true });
+      console.log(data,"message created doctor");
+  
+      res.json(message);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  export const allMessages=async(req,res)=>{
+    try {
+        const message=await Message.find({chat:req.params.chatId}).populate('sender.user','name email').populate('sender.doctor', 'name')
+        res.json(message)
+    } catch (error) {
+        console.log(error.message);
+    }
+}

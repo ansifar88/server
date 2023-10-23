@@ -4,6 +4,7 @@ import moment from "moment";
 import mongoose from "mongoose";
 import Stripe from "stripe";
 import Appointment from "../Models/appointmentModel.js";
+import sendMail from "../utils/sendMail.js";
 // const {  ObjectId } = mongoose;
 
 // export const addSlots = async(req,res,next) => {
@@ -578,6 +579,27 @@ export const appointmentsUser = async(req,res,next) =>{
       
     }else{
       return res.status(200).json({message:"somthing went wrong"})
+
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+export const shareLink = async(req,res,next)=>{
+  try {
+    const{link,id} = req.body
+    const updatedAppointment = await Appointment.findOneAndUpdate({_id :id},{$set:{
+      callId : link
+    }}).populate('user')
+    const email = updatedAppointment.user.email
+    console.log(email);
+     await sendMail(email, "please join", link);
+    if (updatedAppointment) {
+      return res.status(200).json({created :true})
+      
+    }else{
+      return res.status(200).json({created :false})
 
     }
   } catch (error) {

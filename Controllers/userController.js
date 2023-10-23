@@ -145,7 +145,7 @@ export const updateDp = async (req, res, next) => {
 
 export const fetchChats=async(req,res)=>{
   try {
-      console.log('reached');
+      console.log('reached fetchchat');
       const {userId}=req.params
       const result = await Chat.find({ "users.user": userId }).populate('users.user', '-password')
       .populate('users.doctor', '-password')
