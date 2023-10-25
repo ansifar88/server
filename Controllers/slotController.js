@@ -5,111 +5,15 @@ import mongoose from "mongoose";
 import Stripe from "stripe";
 import Appointment from "../Models/appointmentModel.js";
 import sendMail from "../utils/sendMail.js";
+import User from "../Models/userModel.js";
 // const {  ObjectId } = mongoose;
 
-// export const addSlots = async(req,res,next) => {
-//     try {
-//         console.log("add slot function");
-//         const doctorId = req.headers.doctorId
-//         const {startTime, endTime ,date} = req.body
-//         const startingTime = moment(startTime, 'h:mm A');
-//         const currentDate = new Date();
-//         const slotDate = moment(date);
-//         const endingTime = moment(endTime, 'h:mm A');
-//         const slotDuration = 60;
-
-//         if (slotDate.toDate() <= currentDate) {
-//             return res.status(400).send('Slot must be in the future');
-//         }
-
-//         if (endingTime.isBefore(startingTime)) {
-//             console.log('Ending time cannot be less than starting time');
-//             return res.status(400).send('Ending time cannot be less than starting time');
-//         }
-
-//         const durationInMinutes = endingTime.diff(startingTime, 'minutes');
-//         if (durationInMinutes < slotDuration) {
-//             console.log('Minimum slot duration is 1 hour');
-//             return res.status(400).send('Minimum slot duration is 1 hour');
-//         }
-
-//         const findSlotExist = await Slot.findOne({
-//             doctor: doctorId,
-
-//             'slotes': {
-//                 $elemMatch: {
-//                     'slotTime': { $gte: startingTime.format('h:mm A'), $lt: endingTime.format('h:mm A') }
-//                 }
-//             }
-//         })
-
-//         if (findSlotExist) {
-//             return res.status(409).send({ message: "Slot already exists" });
-//         }
-
-//         const findSlots = await Slot.findOne({ doctor: doctorId })
-
-//         const createSlots = generateTimeSlots(startTime, endTime, slotDuration, date);
-
-//         function generateTimeSlots(startTime, endTime, slotDuration, date) {
-//             console.log("end time", endTime);
-//             console.log("start time", startTime);
-//             const slots = [];
-
-//             const end = new Date(`${date} ${endTime}`);
-//             const start = new Date(` ${date} ${startTime} `);
-
-//             console.log({ start });
-//             console.log({ end });
-//             while (start < end) {
-//                 const slotTime = start.toLocaleTimeString('en-US', {
-//                     hour: 'numeric',
-//                     minute: '2-digit',
-//                     hour12: true
-//                 });
-
-//                 const slotDoc = {
-//                     slotTime: slotTime,
-//                     slotDate: date,
-//                     date: slotDate.toDate(),
-//                     isBooked: false
-//                 };
-//                 // console.log(slotDoc);
-//                 slots.push(slotDoc);
-//                 start.setMinutes(start.getMinutes() + slotDuration);
-//             }
-//             // console.log(slots);
-//             return slots;
-//         }
-//         if (!findSlots) {
-//             const newSlot = new Slot({
-//                 doctor: doctorId,
-//                 slotes: createSlots
-//             });
-
-//             const createdSlot = await newSlot.save();
-//             return res.status(201).json(createdSlot);
-//         }
-
-//         createSlots.forEach(slot => {
-//             findSlots.slotes.push(slot);
-//         });
-
-//         await findSlots.save();
-//         return res.status(200).json(findSlotExist);
-
-//         console.log(findSlots);
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// }
 export const addSlots = async (req, res, next) => {
   try {
     console.log("add slot function");
     const doctorId = req.headers.doctorId;
     console.log(doctorId);
-    const { startTime, endTime, startDate, endDate } = req.body; // Add startDate and endDate to specify the date range
-    //   console.log(startDate, endDate);
+    const { startTime, endTime, startDate, endDate } = req.body;
     if (new Date(endDate) < new Date(startDate)) {
       return res.status(400).json({
         message: "End date must be greater than or equal to start date",
@@ -148,7 +52,7 @@ export const addSlots = async (req, res, next) => {
           },
         },
       });
-      console.log(findSlotExist);
+      // console.log(findSlotExist);
       if (findSlotExist) {
         return res.status(409).json({ message: "Slot already exists" });
       }
@@ -294,8 +198,6 @@ export const getSlots = async (req, res, next) => {
   }
 };
 
-
-
 export const getSlotDateUser = async (req, res, next) => {
   try {
     const { doctorId } = req.query;
@@ -342,31 +244,11 @@ export const getSlotsUser = async (req, res, next) => {
     if (!date) {
       return res.status(400).json({ message: "please select Date" });
     }
-    // const formattedDate = moment(date).format('YYYY-MM-DD')
-    //       console.log(formattedDate,"fffffffffffffffffffffff");
-    //   const doctorId = req.headers.doctorId
-
-    //   const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
-
-    // Remove slots older than or equal to yesterday
-    //   await Slot.updateMany(
-    //     {
-    //       doctor: doctorId,
-    //       'slotes.slotDate': { $lte: yesterday },
-    //     },
-    //     {
-    //       $pull: {
-    //         'slotes': {
-    //           slotDate: { $lte: yesterday },
-    //         },
-    //       },
-    //     }
-    //   );
 
     const availableSlots = await Slot.find({
       doctor: doctorId,
       "slotes.slotDate": new Date(date),
-      "slotes.isBooked": false
+      "slotes.isBooked": false,
     }).exec();
 
     if (availableSlots) {
@@ -383,7 +265,7 @@ export const getSlotsUser = async (req, res, next) => {
         return result;
       }, {});
       const mergedArray = [].concat(...Object.values(mergedObject));
-      
+
       console.log(mergedArray);
       return res.status(200).json({ data: mergedArray, message: "success" });
     } else {
@@ -420,49 +302,51 @@ export const payment = async (req, res, next) => {
 export const addAppointment = async (req, res, next) => {
   try {
     console.log(req.body, "book data");
-    const { docId, slotId, paymentstatus,slotDate, slotTime} = req.body.bookData;
+    const { docId, slotId, paymentstatus, slotDate, slotTime } =
+      req.body.bookData;
     const doctor = await Doctor.findById(docId);
-    const userId = req.headers.userId 
+    const userId = req.headers.userId;
 
     const cunsultationFee = doctor.cunsultationFee;
     if (paymentstatus == "success") {
-      
-    const updatedSlot = await Slot.findOneAndUpdate(
-      {
-        doctor: docId,
-        slotes: {
-          $elemMatch: { _id: slotId },
+      const updatedSlot = await Slot.findOneAndUpdate(
+        {
+          doctor: docId,
+          slotes: {
+            $elemMatch: { _id: slotId },
+          },
         },
-      },
-      { $set: { "slotes.$.isBooked": true } }
-    );
-  
-    const Appoinment = new Appointment({
-      doctor: docId,
-      user: userId,
-      consultingFee: doctor.cunsultationFee,
-      paymentStatus: paymentstatus,
-      scheduledAt: {
+        { $set: { "slotes.$.isBooked": true } }
+      );
+
+      const Appoinment = new Appointment({
+        doctor: docId,
+        user: userId,
+        consultingFee: doctor.cunsultationFee,
+        paymentStatus: paymentstatus,
+        scheduledAt: {
           slotTime: slotTime,
           slotDate: slotDate,
           // date: date
+        },
+      });
+      if (Appoinment) {
+        await Appoinment.save();
+        await Doctor.updateOne(
+          { _id: docId },
+          { $inc: { wallet: cunsultationFee } }
+        );
+        return res
+          .status(200)
+          .json({ created: true, message: "Appoinment added successfully" });
       }
-
-  })
-  if (Appoinment) {
-    await Appoinment.save()
-    await Doctor.updateOne({_id : docId},{$inc:{wallet:cunsultationFee}})
-    return res.status(200).json({created :true,message:"Appoinment added successfully"})
-  }
-}else{
-  console.log("payment error");
-}
-
+    } else {
+      console.log("payment error");
+    }
   } catch (error) {
     console.log(error.message);
   }
 };
-
 
 export const getAppointmentDate = async (req, res, next) => {
   try {
@@ -488,9 +372,9 @@ export const getAppointmentDate = async (req, res, next) => {
       },
     ]);
     if (result) {
-      const mergedDates = result.reduce((results,obj) => {
-        return results.concat(obj.appointmentDates)
-      },[]) 
+      const mergedDates = result.reduce((results, obj) => {
+        return results.concat(obj.appointmentDates);
+      }, []);
       // console.log(mergedDates,"result");
       return res.status(200).json({ data: mergedDates, message: "success" });
     } else {
@@ -501,49 +385,6 @@ export const getAppointmentDate = async (req, res, next) => {
   }
 };
 
-
-
-// export const getAppointments = async (req, res, next) => {
-//   try {
-//     const { date } = req.query;
-//     if (!date) {
-//       return res.status(400).json({ message: "please select Date" });
-//     }
-//     const doctorId = req.headers.doctorId;
-
-//     // const yesterday = moment().subtract(1, "days").format("YYYY-MM-DD");
-//     // console.log(yesterday, "yesterday");
-
-//     // Remove slots older than or equal to yesterday
-//     // await Slot.updateMany(
-//     //   {
-//     //     doctor: doctorId,
-//     //     "slotes.slotDate": { $lte: yesterday },
-//     //   },
-//     //   {
-//     //     $pull: {
-//     //       slotes: {
-//     //         slotDate: { $lte: yesterday },
-//     //       },
-//     //     },
-//     //   }
-//     // );
-
-//     const appointments = await Appointment.find({
-//       doctor: doctorId,
-//       "scheduledAt.slotDate": { $eq: new Date(date) },
-//     }).exec();
-
-//     console.log(appointments, "ssssssssssssssss");
-//     if (appointments) {
-//       return res.status(200).json({ data: appointments, message: "success" });
-//     } else {
-//       return res.status(200).json({ message: "slote not avilble" });
-//     }
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// };
 export const getAppointments = async (req, res, next) => {
   try {
     const { date } = req.query;
@@ -554,55 +395,120 @@ export const getAppointments = async (req, res, next) => {
     const appointments = await Appointment.find({
       doctor: doctorId,
       "scheduledAt.slotDate": date,
-    }).populate("user").exec();
-
+    })
+      .populate("user")
+      .exec();
 
     if (appointments) {
       return res.status(200).json({ data: appointments, message: "Success" });
     } else {
       return res.status(200).json({ message: "No appointments available" });
-    } 
+    }
   } catch (error) {
     console.log("Error:", error.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-export const appointmentsUser = async(req,res,next) =>{
+export const appointmentsUser = async (req, res, next) => {
   try {
-    console.log('appointments user');
-    const id = req.headers.userId
-    const appointments = await Appointment.find({user:id}).populate('doctor')
+    console.log("appointments user");
+    const id = req.headers.userId;
+    const appointments = await Appointment.find({ user: id }).populate(
+      "doctor"
+    );
+
+    let currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    const formattedCurrentDate = currentDate.toLocaleString();
+
     if (appointments) {
-      console.log(appointments,'appointments');
-      return res.status(200).json({data:appointments,message:"success"})
-      
-    }else{
-      return res.status(200).json({message:"somthing went wrong"})
-
+      return res.status(200).json({ data: appointments, message: "success" });
+    } else {
+      return res.status(200).json({ message: "somthing went wrong" });
     }
   } catch (error) {
     console.log(error.message);
   }
-}
+};
 
-export const shareLink = async(req,res,next)=>{
+export const shareLink = async (req, res, next) => {
   try {
-    const{link,id} = req.body
-    const updatedAppointment = await Appointment.findOneAndUpdate({_id :id},{$set:{
-      callId : link
-    }}).populate('user')
-    const email = updatedAppointment.user.email
+    const { link, id } = req.body;
+    const updatedAppointment = await Appointment.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          callId: link,
+        },
+      }
+    ).populate("user");
+    const email = updatedAppointment.user.email;
     console.log(email);
-     await sendMail(email, "please join", link);
+    await sendMail(email, "please join", link);
     if (updatedAppointment) {
-      return res.status(200).json({created :true})
-      
-    }else{
-      return res.status(200).json({created :false})
-
+      return res.status(200).json({ created: true });
+    } else {
+      return res.status(200).json({ created: false });
     }
   } catch (error) {
     console.log(error.message);
   }
-}
+};
+
+export const cancelAppointment = async (req, res, next) => {
+  try {
+    console.log("Cancel Appointment");
+    const userId = req.headers.userId;
+    const id = req.body.id;
+    const appointment = await Appointment.findOne({ _id: id }).populate(
+      "doctor"
+    );
+    const doctorId = appointment.doctor._id;
+    const cunsultationFee = appointment.doctor.cunsultationFee;
+    let scheduledDate = new Date(appointment.scheduledAt.slotDate);
+
+    let currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    const formattedScheduledDate = scheduledDate.toLocaleString();
+    const formattedCurrentDate = currentDate.toLocaleString();
+
+    if (formattedScheduledDate > formattedCurrentDate) {
+      const updated = await Appointment.findOneAndUpdate(
+        { _id: id },
+        {
+          $set: {
+            status: "cancelled",
+          },
+        }
+      );
+      if (updated) {
+        await Doctor.findByIdAndUpdate(
+          { _id: doctorId },
+          { $inc: { wallet: -cunsultationFee } }
+        );
+        await User.findByIdAndUpdate(
+          { _id: userId },
+          { $inc: { wallet: cunsultationFee } }
+        );
+        return res
+          .status(200)
+          .json({ updated: true, message: "your appointment is canceled" });
+      } else {
+        return res
+          .status(200)
+          .json({
+            updated: false,
+            message: "somthing went wrong please try later",
+          });
+      }
+    } else {
+      return res
+        .status(200)
+        .json({ message: "You Cant Cancel today Appointment" });
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};

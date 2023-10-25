@@ -60,6 +60,10 @@ const UserSchema = new Schema({
     type: Boolean ,
     default:false
   },
+  wallet:{
+    type: Number,
+    default: 0
+  }
 });
 
 const User = mongoose.model('User', UserSchema);
