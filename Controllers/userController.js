@@ -19,6 +19,7 @@ export const allDoctors = async (req, res, next) => {
     console.log(error.message);
   }
 };
+
 export const doctorSingle = async (req, res, next) => {
   try {
     console.log("inside the docsingle");

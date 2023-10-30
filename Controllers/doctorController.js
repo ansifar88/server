@@ -1,6 +1,7 @@
 import Chat from "../Models/chatModel.js";
 import Department from "../Models/departmentModel.js";
 import Doctor from "../Models/doctorModel.js";
+import Prescription from "../Models/prescriptionModel.js";
 import User from "../Models/userModel.js";
 import {
   uploadToCloudinary,
@@ -180,5 +181,32 @@ export const searchUsers=async(req,res)=>{
       res.status(200).json(users);
   } catch (error) {
       console.log(error.message);
+  }
+}
+
+export const addPrescription = async(req,res,next)=>{
+  try {
+    console.log("in");
+    const {id,medicine,instruction}=req.body
+    console.log(id);
+    console.log(medicine);
+    console.log(instruction);
+    const prescription = new Prescription({
+      appointmentId : id,
+      instructions :  instruction,
+      medicines: []
+    })
+    medicine.forEach((med) => {
+      prescription.medicines.push(med);
+    });
+    prescription.save()
+    if(prescription){
+      return res.status(200).json({created:true})
+    }else{
+      
+      return res.status(200).json({created:false})
+    }
+  } catch (error) {
+    console.log(error.message);
   }
 }

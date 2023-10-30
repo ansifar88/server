@@ -187,11 +187,11 @@ export const getSlots = async (req, res, next) => {
       "slotes.slotDate": { $eq: new Date(date) },
     }).exec();
 
-    console.log(availableSlots, "ssssssssssssssss");
+ 
     if (availableSlots) {
       return res.status(200).json({ data: availableSlots, message: "success" });
     } else {
-      return res.status(200).json({ message: "slote not avilble" });
+      return res.status(200).json({ message: "slot not available" });
     }
   } catch (error) {
     console.log(error.message);
@@ -351,6 +351,7 @@ export const addAppointment = async (req, res, next) => {
 export const getAppointmentDate = async (req, res, next) => {
   try {
     const doctorId = req.headers.doctorId;
+
     const result = await Appointment.aggregate([
       {
         $match: {
@@ -392,6 +393,22 @@ export const getAppointments = async (req, res, next) => {
       return res.status(400).json({ message: "Please select a Date" });
     }
     const doctorId = req.headers.doctorId;
+    const yesterday = moment().subtract(1, "days").format("YYYY-MM-DD");
+
+    await Appointment.updateMany(
+      {
+        doctor: doctorId,
+        "scheduledAt.slotDate": { $lte: yesterday },
+      },
+      {
+        $set: {
+          AppoinmentStatus: "expired",
+        },
+      }
+    );
+
+
+
     const appointments = await Appointment.find({
       doctor: doctorId,
       "scheduledAt.slotDate": date,
