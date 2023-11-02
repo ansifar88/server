@@ -9,6 +9,7 @@ const appointmentSchema = new Schema(
     consultingFee: { type: Number, required: true },
     isConsulted: { type: Boolean, default: false },
     callId: { type: String, default: '' },
+    prescription: { type : Array, default :[]},
     paymentStatus: {
       type: String,
       enum: ["pending", "success"],

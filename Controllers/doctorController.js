@@ -1,3 +1,4 @@
+import Appointment from "../Models/appointmentModel.js";
 import Chat from "../Models/chatModel.js";
 import Department from "../Models/departmentModel.js";
 import Doctor from "../Models/doctorModel.js";
@@ -53,6 +54,7 @@ export const updateProfile = async (req, res, next) => {
 
 export const getDoctor = async (req, res, next) => {
   try {
+    console.log("doctor in");
     const id = req.params.id;
     const data = await Doctor.findById(id).populate("department");
     if (data) {
@@ -184,27 +186,37 @@ export const searchUsers=async(req,res)=>{
   }
 }
 
-export const addPrescription = async(req,res,next)=>{
+export const addPrescription = async (req, res, next) => {
   try {
-    console.log("in");
-    const {id,medicine,instruction}=req.body
-    console.log(id);
-    console.log(medicine);
-    console.log(instruction);
-    const prescription = new Prescription({
-      appointmentId : id,
-      instructions :  instruction,
-      medicines: []
-    })
-    medicine.forEach((med) => {
-      prescription.medicines.push(med);
-    });
-    prescription.save()
-    if(prescription){
-      return res.status(200).json({created:true})
+    const { id, medicine, instruction } = req.body;
+
+    const appointment = await Appointment.findOne({ _id: id });
+
+    if (!appointment) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
+
+    appointment.prescription = medicine;
+
+    await appointment.save();
+
+    return res.status(200).json({ created: true });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+export const confirmCunsult=async(req,res,next) =>{
+  try {
+    console.log(req.params.id,"innn");
+    const updated = await Appointment.updateOne({_id :req.params.id},{$set:{isConsulted : true,status : "cunsulted"}})
+    if (updated) {
+      res.status(200).json({updated :true})
     }else{
-      
-      return res.status(200).json({created:false})
+      res.status(200).json({updated :false})
+
     }
   } catch (error) {
     console.log(error.message);

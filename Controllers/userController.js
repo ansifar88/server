@@ -1,5 +1,7 @@
 import Chat from "../Models/chatModel.js";
 import Doctor from "../Models/doctorModel.js";
+import Prescription from "../Models/prescriptionModel.js";
+import Review from "../Models/reviewModel.js";
 import User from "../Models/userModel.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 
@@ -22,9 +24,7 @@ export const allDoctors = async (req, res, next) => {
 
 export const doctorSingle = async (req, res, next) => {
   try {
-    console.log("inside the docsingle");
     const id = req.params.id;
-    console.log(id);
     const doctor = await Doctor.findOne({ _id: id }).populate("department");
     if (doctor) {
       res.status(200).json({ data: doctor, message: "success" });
@@ -38,6 +38,7 @@ export const doctorSingle = async (req, res, next) => {
 
 export const getUser = async (req, res, next) => {
   try {
+    console.log("user in");
     const id = req.params.id;
     const data = await User.findById(id);
     if (data) {
@@ -142,35 +143,38 @@ export const updateDp = async (req, res, next) => {
   }
 };
 
-
-
-export const fetchChats=async(req,res)=>{
+export const fetchChats = async (req, res) => {
   try {
-      console.log('reached fetchchat');
-      const {userId}=req.params
-      const result = await Chat.find({ "users.user": userId }).populate('users.user', '-password')
-      .populate('users.doctor', '-password')
-      .populate('latestMessage').populate({
-          path: 'latestMessage',
-          populate: {
-            path: 'sender.doctor' ? 'sender.doctor' : 'sender.user',
-            select: '-password',
-          },
-        }).populate({
-          path: 'latestMessage',
-          populate: {
-            path: 'sender.user',
-            select: '-password',
-          },
-        }).then((result)=>{console.log(result),res.send(result)});
-      
+    console.log("reached fetchchat");
+    const { userId } = req.params;
+    const result = await Chat.find({ "users.user": userId })
+      .populate("users.user", "-password")
+      .populate("users.doctor", "-password")
+      .populate("latestMessage")
+      .populate({
+        path: "latestMessage",
+        populate: {
+          path: "sender.doctor" ? "sender.doctor" : "sender.user",
+          select: "-password",
+        },
+      })
+      .populate({
+        path: "latestMessage",
+        populate: {
+          path: "sender.user",
+          select: "-password",
+        },
+      })
+      .then((result) => {
+        console.log(result), res.send(result);
+      });
   } catch (error) {
-      console.log(error.message);
+    console.log(error.message);
   }
-} 
+};
 
 export const searchUsers = async (req, res) => {
-  console.log('reached');
+  console.log("reached");
   const keyword = req.query.search
     ? {
         $or: [
@@ -179,9 +183,85 @@ export const searchUsers = async (req, res) => {
         ],
       }
     : {};
-   
 
-  const users = await Doctor.find(keyword) //.find({ _id: { $ne: req.user._id } });
+  const users = await Doctor.find(keyword); //.find({ _id: { $ne: req.user._id } });
   console.log(users);
   res.status(200).json(users);
+};
+
+export const getPrescription = async (req, res, next) => {
+  try {
+    console.log("inside prescription ");
+    const id = req.params.id;
+    console.log(req.params.id);
+    const prescription = await Prescription.findOne({
+      appointmentId: id,
+    }).populate("appointmentId");
+    console.log(prescription);
+    if (prescription) {
+      return res.status(200).json({ data: prescription });
+    } else {
+      return res.status(200).json({ message: "data not found" });
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+export const addReview = async (req, res, next) => {
+  try {
+    console.log("review in");
+    const userId = req.headers.userId;
+    const { rating, review, id } = req.body;
+    const newReview = new Review({
+      user: userId,
+      doctor: id,
+      reviewText: review,
+      rating: rating,
+    });
+    newReview.save();
+    if (newReview) {
+      return res
+        .status(200)
+        .json({ created: true, message: "Thank You for Your support" });
+    } else {
+      return res
+        .status(200)
+        .json({ created: false, message: "somthing went wrong" });
+    }
+  } catch (error) {
+    console.log(error.massage);
+  }
+};
+
+export const getReview = async (req, res, next) => {
+  try {
+    console.log("get Review in");
+    const id = req.params.id;
+
+    const reviews = await Review.find({ doctor: id })
+    .populate("doctor","-password")
+    .populate("user","-password");
+    const count = reviews.length;
+
+    let avgRating = 0
+    if (count > 0) {
+      const totalRating = reviews.reduce(
+        (total, review) => total + review.rating, 0
+      );
+      const avgRatingStr = (totalRating / count).toFixed(1);
+      avgRating = Number(avgRatingStr);
+    } else {
+      console.log("No reviews found.");
+    }
+    if (reviews) {
+      return res.status(200).json({data:reviews,count:count,avgRating:avgRating})
+      
+    } else {
+      return res.status(200).json({mesaage:"Reviws not found"})
+      
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
 };

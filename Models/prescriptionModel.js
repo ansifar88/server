@@ -2,8 +2,8 @@ import { Schema } from "mongoose";
 import mongoose from "mongoose";
 const prescriptionSchema = new Schema({
     appointmentId: {
-        type: Schema.Types.ObjectId,
-        ref: "Appointment",
+        type: String,
+        
       },
       medicines :{
         type: Array,

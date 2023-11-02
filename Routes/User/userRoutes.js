@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router()
 import upload from '../../MiddleWares/multer.js';
 
-import { allDoctors,doctorSingle,getUser,updateProfile,updateDp,editProfile, fetchChats, searchUsers } from '../../Controllers/userController.js';
+import { allDoctors,doctorSingle,getUser,updateProfile,updateDp,editProfile, fetchChats, searchUsers, getPrescription, addReview, getReview } from '../../Controllers/userController.js';
 import { userAuth } from '../../MiddleWares/Auth.js';
 import { getSlotDateUser,getSlotsUser, payment ,addAppointment, appointmentsUser,cancelAppointment} from '../../Controllers/slotController.js';
 import { accessChat, allMessages, sendMessage } from '../../Controllers/chatController.js';
@@ -26,5 +26,9 @@ router.get('/fetchchat/:userId',fetchChats)
 router.get('/usersearch',searchUsers)
 router.post('/message',sendMessage)
 router.get('/message/:chatId',allMessages)
+router.get('/prescription/:id',userAuth,getPrescription)
+
+router.post('/review',userAuth,addReview)
+router.get('/review/:id',userAuth,getReview)
 
 export default router 

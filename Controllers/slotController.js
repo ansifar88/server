@@ -12,7 +12,6 @@ export const addSlots = async (req, res, next) => {
   try {
     console.log("add slot function");
     const doctorId = req.headers.doctorId;
-    console.log(doctorId);
     const { startTime, endTime, startDate, endDate } = req.body;
     if (new Date(endDate) < new Date(startDate)) {
       return res.status(400).json({
@@ -68,14 +67,12 @@ export const addSlots = async (req, res, next) => {
         slots: createSlots,
       });
 
-      // Move to the next day
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    // Now you have an array of created slots for each day within the date range
-    //   console.log(createdSlots);
+    // created slots for each day within the date range
 
-    // Save these slots in your database using Mongoose
+    // Save these slots
     const slotData = createdSlots.map((slotObj) => {
       return {
         doctor: doctorId,
@@ -187,7 +184,6 @@ export const getSlots = async (req, res, next) => {
       "slotes.slotDate": { $eq: new Date(date) },
     }).exec();
 
- 
     if (availableSlots) {
       return res.status(200).json({ data: availableSlots, message: "success" });
     } else {
@@ -240,7 +236,6 @@ export const getSlotDateUser = async (req, res, next) => {
 export const getSlotsUser = async (req, res, next) => {
   try {
     const { date, doctorId } = req.query;
-    console.log("getSlotsUser");
     if (!date) {
       return res.status(400).json({ message: "please select Date" });
     }
@@ -252,7 +247,6 @@ export const getSlotsUser = async (req, res, next) => {
     }).exec();
 
     if (availableSlots) {
-      // console.log(availableSlots);
       const mergedObject = availableSlots.reduce((result, slot) => {
         slot.slotes.forEach((slotInfo) => {
           if (slotInfo.slotDate) {
@@ -407,8 +401,6 @@ export const getAppointments = async (req, res, next) => {
       }
     );
 
-
-
     const appointments = await Appointment.find({
       doctor: doctorId,
       "scheduledAt.slotDate": date,
@@ -429,13 +421,13 @@ export const getAppointments = async (req, res, next) => {
 
 export const appointmentsUser = async (req, res, next) => {
   try {
-    console.log("appointments user");
     const id = req.headers.userId;
-    const appointments = await Appointment.find({ user: id }).populate(
-      "doctor"
-    );
+    const appointments = await Appointment.find({ user: id })
+      .populate("doctor")
+      .populate("user");
 
     let currentDate = new Date();
+
     currentDate.setHours(0, 0, 0, 0);
     const formattedCurrentDate = currentDate.toLocaleString();
 
@@ -513,12 +505,10 @@ export const cancelAppointment = async (req, res, next) => {
           .status(200)
           .json({ updated: true, message: "your appointment is canceled" });
       } else {
-        return res
-          .status(200)
-          .json({
-            updated: false,
-            message: "somthing went wrong please try later",
-          });
+        return res.status(200).json({
+          updated: false,
+          message: "somthing went wrong please try later",
+        });
       }
     } else {
       return res
