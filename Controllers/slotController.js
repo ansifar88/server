@@ -489,9 +489,11 @@ export const cancelAppointment = async (req, res, next) => {
         {
           $set: {
             status: "cancelled",
+
           },
         }
       );
+      
       if (updated) {
         await Doctor.findByIdAndUpdate(
           { _id: doctorId },

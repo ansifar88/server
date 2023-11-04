@@ -55,6 +55,9 @@ const DoctorSchema = new Schema({
   certificates: {
     type: Array,
   },
+  languages: {
+    type: Array,
+  },
   slot: {
     type: Number,
   },

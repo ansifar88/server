@@ -18,10 +18,10 @@ const appointmentSchema = new Schema(
     status: {
       type: String,
       enum: [
-        "consulted",
+        "cunsulted",
         "cancelled",
         "notConsulted",
-        // "cancellation-requested",
+
       ],
       default: "notConsulted",
     },

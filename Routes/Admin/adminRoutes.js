@@ -12,7 +12,8 @@ import {
   allDoctors,
   doctorManage,
   departmentManage,
-  rejectDoctor
+  rejectDoctor,
+  dashboard
 } from "../../Controllers/adminController.js";
 import { adminAuth } from "../../MiddleWares/Auth.js";
 
@@ -27,5 +28,6 @@ router.get("/doctors", adminAuth, allDoctors);
 router.put("/managedoctor/:id", doctorManage);
 router.put("/managedepartment/:id", departmentManage);
 router.put("/rejectDoctor/:id", rejectDoctor);
+router.get("/dashboard", adminAuth, dashboard);
 
 export default router;

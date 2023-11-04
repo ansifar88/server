@@ -3,6 +3,7 @@ import Doctor from "../Models/doctorModel.js";
 import User from "../Models/userModel.js";
 import { upperCase } from "upper-case";
 import { sendRejectionMail } from "../utils/sendMail.js";
+import Appointment from "../Models/appointmentModel.js";
 
 export const allUsers = async (req, res, next) => {
   try {
@@ -23,11 +24,12 @@ export const allUsers = async (req, res, next) => {
     const perPage = 4;
     const skip = (page - 1) * perPage;
 
-
-    const count = await User.find(query).countDocuments()
+    const count = await User.find(query).countDocuments();
     const users = await User.find(query).skip(skip).limit(perPage);
-    console.log(count)
-    return res.status(200).json({ data: users,count,pageSize:perPage,page });
+    console.log(count);
+    return res
+      .status(200)
+      .json({ data: users, count, pageSize: perPage, page });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ error: "Internal server error" });
@@ -81,8 +83,6 @@ export const addDepartment = async (req, res, next) => {
   }
 };
 
-
-
 export const allDepartments = async (req, res, next) => {
   try {
     const { page, filter, search } = req.query;
@@ -97,16 +97,17 @@ export const allDepartments = async (req, res, next) => {
 
     if (search) {
       query.name = { $regex: new RegExp(search, "i") };
-    } 
+    }
 
     const perPage = 4;
     const skip = (page - 1) * perPage;
 
-
-    const count = await Department.find(query).countDocuments()
+    const count = await Department.find(query).countDocuments();
     const departments = await Department.find(query).skip(skip).limit(perPage);
-    console.log(count)
-    return res.status(200).json({ data: departments,count,pageSize:perPage,page });
+    console.log(count);
+    return res
+      .status(200)
+      .json({ data: departments, count, pageSize: perPage, page });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ error: "Internal server error" });
@@ -161,7 +162,6 @@ export const verifyDoctor = async (req, res, next) => {
   }
 };
 
-
 export const allDoctors = async (req, res, next) => {
   try {
     const { page, filter, search } = req.query;
@@ -172,8 +172,8 @@ export const allDoctors = async (req, res, next) => {
       query.is_blocked = false;
     } else if (filter === "blocked") {
       query.is_blocked = true;
-    } else if(filter === "notVerified"){
-      query.verified = false
+    } else if (filter === "notVerified") {
+      query.verified = false;
     }
 
     if (search) {
@@ -183,11 +183,12 @@ export const allDoctors = async (req, res, next) => {
     const perPage = 4;
     const skip = (page - 1) * perPage;
 
-
-    const count = await Doctor.find(query).countDocuments()
+    const count = await Doctor.find(query).countDocuments();
     const doctors = await Doctor.find(query).skip(skip).limit(perPage);
-    console.log(count)
-    return res.status(200).json({ data: doctors,count,pageSize:perPage,page });
+    console.log(count);
+    return res
+      .status(200)
+      .json({ data: doctors, count, pageSize: perPage, page });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ error: "Internal server error" });
@@ -249,5 +250,45 @@ export const rejectDoctor = async (req, res, next) => {
     return res.status(200).json({ reject: true, message: "doctor rejected" });
   } catch (error) {
     console.log(error.message);
+  }
+};
+export const dashboard = async (req, res, next) => {
+  try {
+    console.log("admin dashboard");
+    const [totalUsers, totalDoctors, totalDepartments] = await Promise.all([
+      User.countDocuments(),
+      Doctor.countDocuments(),
+      Department.countDocuments(),
+    ]);
+
+    const doctorAppointments = await Appointment.aggregate([
+      {
+        $group: {
+          _id: '$doctor',
+          appointmentCount: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const doctorCounts = await Promise.all(
+      doctorAppointments.map(async (doctorAppointment) => {
+        const doctor = await Doctor.findById(doctorAppointment._id, 'name').populate("department");
+        return {
+          id: doctor._id,
+          name: doctor.name,
+          department:doctor.department.departmentName,
+          appointmentCount: doctorAppointment.appointmentCount,
+        };
+      })
+    );
+
+    console.log(doctorCounts);
+    
+   
+    
+    return res.status(200).json({ totalUsers, totalDoctors, totalDepartments ,doctorCounts});
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
