@@ -57,7 +57,7 @@ const server = app.listen(process.env.PORTNUMBER,()=>{
 const io = new Server(server, {
     pingTimeout: 60000,
     cors: {
-      origin: ['http://localhost:5173',"https://virtualcare.vercel.app"]
+      origin: ['http://localhost:5173',"https://virtualcares.vercel.app"]
     }
   });
   io.on("connection",(socket)=>{
