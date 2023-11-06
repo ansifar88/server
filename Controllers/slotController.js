@@ -272,9 +272,7 @@ export const getSlotsUser = async (req, res, next) => {
 
 export const payment = async (req, res, next) => {
   try {
-    const stripe = new Stripe(
-      "sk_test_51O11IzSJfBiixPMTuMIQ5XnJMHD2niq1bWmFC9qjOQ11GIMxsADIsMfJ4azYq8PKqCKkp5KEmFkLzaZsmdoguEZl00WG2wrBwR"
-    );
+    const stripe = new Stripe(process.env.STRIPESECRETKEY);
     const doctor = await Doctor.findById(req.params.id);
     const cunsultationFee = doctor.cunsultationFee;
 
@@ -489,11 +487,10 @@ export const cancelAppointment = async (req, res, next) => {
         {
           $set: {
             status: "cancelled",
-
           },
         }
       );
-      
+
       if (updated) {
         await Doctor.findByIdAndUpdate(
           { _id: doctorId },
