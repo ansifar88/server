@@ -62,7 +62,7 @@ export const verification = async (req, res) => {
     await Tokenmodel.deleteOne({ _id: token._id });
 
     const jwtToken = jwt.sign({ _id: user._id }, process.env.JWTUSERSECRET, {
-      expiresIn: "24hr",
+      expiresIn: "7d",
     });
     const redirectUrl = process.env.REDIRECTURL;
     res.redirect(redirectUrl);
@@ -93,7 +93,7 @@ export const login = async (req, res, next) => {
         .json({ access: false, message: "invalid password" });
 
     const token = jwt.sign({ userId: user._id }, process.env.JWTUSERSECRET, {
-      expiresIn: "24hr",
+      expiresIn: "7d",
     });
 
     return res
@@ -101,6 +101,7 @@ export const login = async (req, res, next) => {
       .json({ access: true, token, user, message: "logged in" });
   } catch (error) {
     console.log(error.message);
+    return res.status(500).json({ access: false, message: "Internal Server Error" });
   }
 };
 
@@ -125,7 +126,7 @@ export const SignupWithGoogle = async (req, res, next) => {
       let user = await newUser.save().then(console.log("saved"));
       await User.updateOne({ _id: user._id }, { $set: { verified: true } });
       const token = jwt.sign({ userId: user._id }, process.env.JWTUSERSECRET, {
-        expiresIn: "24hr",
+        expiresIn: "7d",
       });
       return res.status(200).json({
         created: true,

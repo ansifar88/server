@@ -21,7 +21,7 @@ export const Signup = async (req, res, next) => {
       });
       let doctor = await newDoctor.save().then(console.log("Registered"));
       const token = jwt.sign({ doctorId: newDoctor._id }, process.env.JWTDOCTORSECRET, {
-        expiresIn: "24hr",
+        expiresIn: "7d",
       });
       return res
         .status(200)
@@ -49,7 +49,7 @@ export const Login = async (req, res, next) => {
         .json({ access: false, message: "invalid password" });
 
     const token = jwt.sign({ doctorId: doctor._id }, process.env.JWTDOCTORSECRET, {
-      expiresIn: "24hr",
+      expiresIn: "7d",
     });
 
     return res
@@ -78,7 +78,7 @@ export const SignupWithGoogle = async (req, res, next) => {
       });
       let doctor = await newDoctor.save().then(console.log("saved"));
       const token = jwt.sign({ doctorId: doctor._id }, process.env.JWTDOCTORSECRET, {
-        expiresIn: "24hr",
+        expiresIn: "7d",
       });
       return res
         .status(200)
