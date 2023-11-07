@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 export const Signup = async (req, res, next) => {
   try {
-    console.log("Doctor signup");
+    console.log("inside Doctor signup");
     const { name, email, mobile, password } = req.body;
     const exist = await Doctor.findOne({ email: email });
     if (exist) {
@@ -34,6 +34,7 @@ export const Signup = async (req, res, next) => {
 
 export const Login = async (req, res, next) => {
   try {
+    console.log("inside doctor login");
     const { email, password } = req.body;
     const doctor = await Doctor.findOne({ email: email });
     if (!doctor ) {
@@ -62,7 +63,7 @@ export const Login = async (req, res, next) => {
 
 export const SignupWithGoogle = async (req, res, next) => {
   try {
-    console.log("doctor signupgoogle");
+    console.log("inside doctor signup google");
     const { name, email, id } = req.body;
     const exist = await Doctor.findOne({ email: email });
     if (exist) {
