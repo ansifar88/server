@@ -22,6 +22,7 @@ export const updateProfile = async (req, res, next) => {
       qualification,
       experience,
       description,
+      cunsultationFee
     } = req.body;
     const uploadedImages = await MultiUploadCloudinary(
       req.files,
@@ -39,6 +40,7 @@ export const updateProfile = async (req, res, next) => {
           experience: experience,
           description: description,
           certificates: uploadedImages,
+          cunsultationFee : cunsultationFee,
           requested: true,
         },
       }

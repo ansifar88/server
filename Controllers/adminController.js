@@ -282,7 +282,6 @@ export const dashboard = async (req, res, next) => {
       })
     );
 
-    console.log(doctorCounts);
     
    
     
