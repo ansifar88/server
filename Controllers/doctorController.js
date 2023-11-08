@@ -9,6 +9,7 @@ import {
   uploadToCloudinary,
   MultiUploadCloudinary,
 } from "../utils/cloudinary.js";
+import Payments from "../Models/paymentHistoryModel.js";
 
 export const updateProfile = async (req, res, next) => {
   try {
@@ -310,3 +311,19 @@ export const dashBoard = async (req, res, next) => {
     console.log(error.message);
   }
 };
+
+export const paymentHistory = async(req,res,next)=>{
+  try {
+    const id = req.headers.doctorId
+    const payments = await Payments.find({doctor : id}).populate("user","name")
+   
+    if (payments) {
+      return res.status(200).json({data:payments })
+    }else{
+      return res.status(200).json({message:"no data found" })
+
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+}

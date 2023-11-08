@@ -6,6 +6,7 @@ import Stripe from "stripe";
 import Appointment from "../Models/appointmentModel.js";
 import sendMail from "../utils/sendMail.js";
 import User from "../Models/userModel.js";
+import Payments from "../Models/paymentHistoryModel.js";
 // const {  ObjectId } = mongoose;
 
 export const addSlots = async (req, res, next) => {
@@ -322,12 +323,19 @@ export const addAppointment = async (req, res, next) => {
           // date: date
         },
       });
+      await Appoinment.save();
       if (Appoinment) {
-        await Appoinment.save();
         await Doctor.updateOne(
           { _id: docId },
           { $inc: { wallet: cunsultationFee } }
         );
+        const payment = new Payments({
+          doctor: docId,
+          user: userId,
+          date: Date.now(),
+          amount: doctor.cunsultationFee,
+        });
+        await payment.save();
         return res
           .status(200)
           .json({ created: true, message: "Appoinment added successfully" });
@@ -481,7 +489,7 @@ export const cancelAppointment = async (req, res, next) => {
     const formattedScheduledDate = scheduledDate.toLocaleString();
     const formattedCurrentDate = currentDate.toLocaleString();
 
-    if (formattedScheduledDate > formattedCurrentDate) {
+    if (scheduledDate > currentDate) {
       const updated = await Appointment.findOneAndUpdate(
         { _id: id },
         {
@@ -500,6 +508,13 @@ export const cancelAppointment = async (req, res, next) => {
           { _id: userId },
           { $inc: { wallet: cunsultationFee } }
         );
+        const payment = new Payments({
+          doctor: doctorId,
+          user: userId,
+          date: Date.now(),
+          amount: -cunsultationFee,
+        });
+        await payment.save();
         return res
           .status(200)
           .json({ updated: true, message: "your appointment is canceled" });
