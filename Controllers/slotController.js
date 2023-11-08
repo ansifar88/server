@@ -278,14 +278,9 @@ export const payment = async (req, res, next) => {
 
     const doctor = await Doctor.findById(req.params.id);
     const cunsultationFee = doctor.cunsultationFee;
-    console.log(cunsultationFee, "cnsultation fee");
-    console.log(typeof cunsultationFee, "type of cunsultation fee");
-    const fees = Number(cunsultationFee);
-    console.log(fees, "converted fee");
-    console.log(typeof fees, "type of converted fee");
     //create paymentintent
     const paymentintent = await stripe.paymentIntents.create({
-      amount: fees * 100,
+      amount: cunsultationFee * 100,
       currency: "inr",
       automatic_payment_methods: {
         enabled: true,
