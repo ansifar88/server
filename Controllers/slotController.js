@@ -272,7 +272,8 @@ export const getSlotsUser = async (req, res, next) => {
 export const payment = async (req, res, next) => {
   try {
     console.log("iside stripe");
-    const stripe = new Stripe(process.env.STRIPESECRETKEY);
+    const stripe = new Stripe("sk_test_51O11IzSJfBiixPMTuMIQ5XnJMHD2niq1bWmFC9qjOQ11GIMxsADIsMfJ4azYq8PKqCKkp5KEmFkLzaZsmdoguEZl00WG2wrBwR");
+    console.log("iside stripe 2");
     const doctor = await Doctor.findById(req.params.id);
     const cunsultationFee = doctor.cunsultationFee;
 
