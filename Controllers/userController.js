@@ -79,7 +79,6 @@ export const updateProfile = async (req, res, next) => {
       return res.status(200).json({ message: "profile updation failed" });
     }
 
-    console.log(req.body);
   } catch (error) {
     console.log(error.message);
   }
@@ -112,7 +111,6 @@ export const editProfile = async (req, res, next) => {
       return res.status(200).json({ message: "profile edit failed" });
     }
 
-    console.log(req.body);
   } catch (error) {
     console.log(error.message);
   }

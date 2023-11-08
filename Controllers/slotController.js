@@ -96,7 +96,6 @@ function generateTimeSlots(startTime, endTime, slotDuration, date) {
 
   const end = new Date(`${date} ${endTime}`);
   const start = new Date(` ${date} ${startTime} `);
-  console.log(start, "slot date");
 
   while (start < end) {
     const slotTime = start.toLocaleTimeString("en-US", {
@@ -261,7 +260,6 @@ export const getSlotsUser = async (req, res, next) => {
       }, {});
       const mergedArray = [].concat(...Object.values(mergedObject));
 
-      console.log(mergedArray);
       return res.status(200).json({ data: mergedArray, message: "success" });
     } else {
       return res.status(200).json({ message: "slote not avilble" });
@@ -273,6 +271,7 @@ export const getSlotsUser = async (req, res, next) => {
 
 export const payment = async (req, res, next) => {
   try {
+    console.log("iside stripe");
     const stripe = new Stripe(process.env.STRIPESECRETKEY);
     const doctor = await Doctor.findById(req.params.id);
     const cunsultationFee = doctor.cunsultationFee;
@@ -294,7 +293,7 @@ export const payment = async (req, res, next) => {
 };
 export const addAppointment = async (req, res, next) => {
   try {
-    console.log(req.body, "book data");
+    console.log("book data");
     const { docId, slotId, paymentstatus, slotDate, slotTime } =
       req.body.bookData;
     const doctor = await Doctor.findById(docId);
