@@ -272,14 +272,16 @@ export const getSlotsUser = async (req, res, next) => {
 export const payment = async (req, res, next) => {
   try {
     console.log("iside stripe");
-    const stripe = new Stripe("sk_test_51O11IzSJfBiixPMTuMIQ5XnJMHD2niq1bWmFC9qjOQ11GIMxsADIsMfJ4azYq8PKqCKkp5KEmFkLzaZsmdoguEZl00WG2wrBwR");
-    console.log("iside stripe 2");
+    const stripe = new Stripe(
+      "sk_test_51O11IzSJfBiixPMTuMIQ5XnJMHD2niq1bWmFC9qjOQ11GIMxsADIsMfJ4azYq8PKqCKkp5KEmFkLzaZsmdoguEZl00WG2wrBwR"
+    );
+   
     const doctor = await Doctor.findById(req.params.id);
     const cunsultationFee = doctor.cunsultationFee;
-
+    console.log(typeof( cunsultationFee));
     //create paymentintent
     const paymentintent = await stripe.paymentIntents.create({
-      amount: cunsultationFee * 100,
+      amount: 100 * 100,
       currency: "inr",
       automatic_payment_methods: {
         enabled: true,
