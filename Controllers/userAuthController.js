@@ -86,6 +86,43 @@ export const login = async (req, res, next) => {
         .status(201)
         .json({ access: false, message: "You are blocked by admin" });
     }
+    if (user.verified === false) {
+      return res
+        .status(201)
+        .json({ access: false, message: "Please verify your email" });
+    }
+    const isCorrect = await bcrypt.compare(password, user.password);
+    if (!isCorrect)
+      return res
+        .status(201)
+        .json({ access: false, message: "invalid password" });
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWTUSERSECRET, {
+      expiresIn: "7d",
+    });
+
+    return res
+      .status(200)
+      .json({ access: true, token, user, message: "logged in" });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ access: false, message: "Internal Server Error" });
+  }
+};
+export const googleLogin = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email });
+    console.log(user, "useer");
+    if (!user || user.is_admin === true) {
+      return res.status(201).json({ access: false, message: "user not found" });
+    }
+    if (user.is_blocked === true) {
+      return res
+        .status(201)
+        .json({ access: false, message: "You are blocked by admin" });
+    }
+   
     const isCorrect = await bcrypt.compare(password, user.password);
     if (!isCorrect)
       return res
