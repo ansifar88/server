@@ -77,7 +77,6 @@ export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email });
-    console.log(user, "useer");
     if (!user || user.is_admin === true) {
       return res.status(201).json({ access: false, message: "user not found" });
     }

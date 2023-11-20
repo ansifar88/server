@@ -9,7 +9,7 @@ import { accessChat, allMessages, sendMessage } from '../../Controllers/chatCont
 
 router.get('/SnDOC/:id',userAuth,doctorSingle)
 router.get('/doctors',userAuth,allDoctors)
-router.get('/profile/:id',userAuth,getUser)
+router.get('/profile',userAuth,getUser)
 router.put('/profile/:id',updateProfile)
 router.put('/editProfile/:id',editProfile)
 router.put('/dp/:id',upload.single("dp"),updateDp)

@@ -39,7 +39,7 @@ export const doctorSingle = async (req, res, next) => {
 export const getUser = async (req, res, next) => {
   try {
     console.log("user in");
-    const id = req.params.id;
+    const id = req.headers.userId
     const data = await User.findById(id);
     if (data) {
       return res.status(200).json({ data: data });
