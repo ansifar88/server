@@ -121,6 +121,7 @@ function generateTimeSlots(startTime, endTime, slotDuration, date) {
 export const getSlotDate = async (req, res, next) => {
   try {
     const doctorId = req.headers.doctorId;
+
     const result = await Slot.aggregate([
       {
         $match: {
@@ -141,10 +142,11 @@ export const getSlotDate = async (req, res, next) => {
         },
       },
     ]);
+    const doctor = await Doctor.findOne({_id :doctorId},{ verified: 1 })
     if (result) {
       const slotArray = result.map((item) => item.slotDates);
       const slotDates = slotArray.flat();
-      return res.status(200).json({ data: slotDates, message: "success" });
+      return res.status(200).json({ data: slotDates,doctor:doctor, message: "success" });
     } else {
       return res.status(200).json({ message: "No slots" });
     }
