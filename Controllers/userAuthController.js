@@ -62,7 +62,7 @@ export const verification = async (req, res) => {
     await Tokenmodel.deleteOne({ _id: token._id });
 
     const jwtToken = jwt.sign({ _id: user._id }, process.env.JWTUSERSECRET, {
-      expiresIn: "7d",
+      expiresIn: "1h",
     });
     const redirectUrl = process.env.REDIRECTURL;
     res.redirect(redirectUrl);
@@ -97,7 +97,7 @@ export const login = async (req, res, next) => {
         .json({ access: false, message: "invalid password" });
 
     const token = jwt.sign({ userId: user._id }, process.env.JWTUSERSECRET, {
-      expiresIn: "7d",
+      expiresIn: "1h",
     });
 
     return res
@@ -112,7 +112,6 @@ export const googleLogin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email });
-    console.log(user, "useer");
     if (!user || user.is_admin === true) {
       return res.status(201).json({ access: false, message: "user not found" });
     }
@@ -126,10 +125,10 @@ export const googleLogin = async (req, res, next) => {
     if (!isCorrect)
       return res
         .status(201)
-        .json({ access: false, message: "invalid password" });
+        .json({ access: false, message: "invalid password or email" });
 
     const token = jwt.sign({ userId: user._id }, process.env.JWTUSERSECRET, {
-      expiresIn: "7d",
+      expiresIn: "1h",
     });
 
     return res
@@ -162,7 +161,7 @@ export const SignupWithGoogle = async (req, res, next) => {
       let user = await newUser.save().then(console.log("saved"));
       await User.updateOne({ _id: user._id }, { $set: { verified: true } });
       const token = jwt.sign({ userId: user._id }, process.env.JWTUSERSECRET, {
-        expiresIn: "7d",
+        expiresIn: "1h",
       });
       return res.status(200).json({
         created: true,

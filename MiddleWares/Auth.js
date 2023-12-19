@@ -8,28 +8,36 @@ dotenv.config();
 
 export const userAuth = async (req, res, next) => {
   try {
-    if (req.headers.authorization) { 
-      
+    if (req.headers.authorization) {
       let token = req.headers.authorization.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWTUSERSECRET);
-      const user = await User.findOne({
-        _id: decoded.userId,
-      });
-      if (user) {
-        if (user.is_blocked === false) {
-          req.headers.userId = decoded.userId
+      const decoded = jwt.verify(
+        token,
+        process.env.JWTUSERSECRET,
+        async (err, decoded) => {
+          if (err) {
+            return res.status(401).json({ message: "Token expired please login" });
+          } else {
+            const user = await User.findOne({
+              _id: decoded.userId,
+            });
+            if (user) {
+              if (user.is_blocked === false) {
+                req.headers.userId = decoded.userId;
 
-          next();
-        } else {
-          return res
-            .status(403)
-            .json({ data: { message: "You are blocked by admin " } });
+                next();
+              } else {
+                return res
+                  .status(403)
+                  .json({ message: "You are blocked by admin " } );
+              }
+            } else {
+              return res
+                .status(400)
+                .json({ message: "user not authorised or inavid user" });
+            }
+          }
         }
-      } else {
-        return res
-          .status(400)
-          .json({ message: "user not authorised or inavid user" });
-      }
+      );
     } else {
       return res.status(400).json({ message: "user not authorised" });
     }
@@ -48,7 +56,7 @@ export const doctorAuth = async (req, res, next) => {
       });
       if (doctor) {
         if (doctor.is_blocked === false) {
-          req.headers.doctorId = decoded.doctorId
+          req.headers.doctorId = decoded.doctorId;
           next();
         } else {
           return res
